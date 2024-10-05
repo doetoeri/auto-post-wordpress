@@ -17,24 +17,20 @@ wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNA
 def generate_blog_content():
     try:
         # 본문 생성 API 호출
-        content_response = openai.Client().completions.create(
+        content_response = openai.Completion.create(
             model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that writes blog posts."},
-                {"role": "user", "content": "Write a detailed blog post about technology trends in 2024"}
-            ]
+            prompt="Write a detailed blog post about technology trends in 2024",
+            max_tokens=1000
         )
-        content = content_response['choices'][0]['message']['content']
+        content = content_response['choices'][0]['text']
 
         # 제목 생성 API 호출
-        title_response = openai.Client().completions.create(
+        title_response = openai.Completion.create(
             model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that generates blog titles."},
-                {"role": "user", "content": "Generate a creative title for a blog post about technology trends in 2024"}
-            ]
+            prompt="Generate a creative title for a blog post about technology trends in 2024",
+            max_tokens=10
         )
-        title = title_response['choices'][0]['message']['content'].strip()
+        title = title_response['choices'][0]['text'].strip()
 
         return title, content
     
