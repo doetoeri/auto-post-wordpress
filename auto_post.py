@@ -8,7 +8,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # OpenAI API 설정
-openai.api_key = os.getenv('OPENAI_API_KEY')
+client = openai.Client(api_key=os.getenv('OPENAI_API_KEY'))
 
 # WordPress 클라이언트 설정 (GitHub Secrets에서 사용자 정보 가져옴)
 wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNAME'), os.getenv('WP_PASSWORD'))
@@ -17,7 +17,7 @@ wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNA
 def generate_blog_content():
     try:
         # 본문 생성 API 호출
-        content_response = openai.Completion.create(
+        content_response = client.completions.create(
             model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
             prompt="Write a detailed blog post about technology trends in 2024",
             max_tokens=1000
@@ -25,7 +25,7 @@ def generate_blog_content():
         content = content_response['choices'][0]['text']
 
         # 제목 생성 API 호출
-        title_response = openai.Completion.create(
+        title_response = client.completions.create(
             model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
             prompt="Generate a creative title for a blog post about technology trends in 2024",
             max_tokens=10
