@@ -1,0 +1,27 @@
+name: Auto Post to WordPress
+
+# 매일 아침 6시에 자동으로 실행되도록 cron을 설정
+on:
+  schedule:
+    - cron: "0 6 * * *"  # 아침 6시 (UTC 기준, 한국 시간은 UTC+9)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12.6'  # Python 3.12.6 버전 설정
+
+    - name: Install dependencies
+      run: |
+        pip install openai python-wordpress-xmlrpc schedule
+
+    - name: Run the Python script
+      run: |
+        python auto_post.py
