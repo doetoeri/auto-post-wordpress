@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install openai python-wordpress-xmlrpc requests
+        pip install openai python-wordpress-xmlrpc requests  # 필요한 모듈 설치
 
     - name: Run the Python script
       env:
