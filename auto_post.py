@@ -7,37 +7,37 @@ import logging
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
 
-# OpenAI API 키를 GitHub Secrets에서 가져옴
+# OpenAI API 키 설정
 openai.api_key = os.getenv('OPENAI_API_KEY')
 
-# WordPress 클라이언트 설정 (GitHub Secrets에서 사용자 정보 가져옴)
+# WordPress 클라이언트 설정
 wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNAME'), os.getenv('WP_PASSWORD'))
 
 # GPT로 블로그 글 생성
 def generate_blog_content():
     try:
-        # 본문 생성 API 호출
+        # 본문 생성
         content_response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that writes blog posts."},
-                {"role": "user", "content": "Write a detailed blog post about technology trends in 2024"}
+                {"role": "system", "content": "You are '봇츠와나', a Countryball character who writes humorous and light-hearted news articles covering politics, climate change, sports, culture, and science."},
+                {"role": "user", "content": "Write today's news article in the style described."}
             ]
         )
         content = content_response['choices'][0]['message']['content']
 
-        # 제목 생성 API 호출
+        # 제목 생성
         title_response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that writes blog post titles."},
-                {"role": "user", "content": "Generate a creative title for a blog post about technology trends in 2024"}
+                {"role": "system", "content": "You are '봇츠와나', a Countryball character who writes creative and catchy news headlines."},
+                {"role": "user", "content": "Generate a creative title for today's news article."}
             ]
         )
         title = title_response['choices'][0]['message']['content'].strip()
 
         return title, content
-    
+
     except Exception as e:
         logging.error(f"Error generating blog content: {e}")
         return None, None
