@@ -23,7 +23,7 @@ def generate_blog_content():
             prompt="Write a detailed blog post about technology trends in 2024",
             max_tokens=1000
         )
-        content = content_response['choices'][0]['text']
+        content = content_response['choices'][0]['text'].strip()
         
         title_response = openai.Completion.create(
             engine="text-davinci-003",
