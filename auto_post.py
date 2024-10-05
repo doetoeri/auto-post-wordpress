@@ -2,8 +2,12 @@ import os
 import openai
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import NewPost
-from wordpress_xmlrpc.methods import posts
 import logging
+import schedule
+import time
+
+# 로깅 설정
+logging.basicConfig(level=logging.INFO)
 
 # OpenAI API 키를 GitHub Secrets에서 가져옴
 openai.api_key = os.getenv('OPENAI_API_KEY')
@@ -14,7 +18,6 @@ wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNA
 # GPT로 블로그 글 생성
 def generate_blog_content():
     try:
-        # 본문 생성 API 호출
         content_response = openai.Completion.create(
             engine="text-davinci-003",
             prompt="Write a detailed blog post about technology trends in 2024",
@@ -22,7 +25,6 @@ def generate_blog_content():
         )
         content = content_response['choices'][0]['text']
         
-        # 제목 생성 API 호출
         title_response = openai.Completion.create(
             engine="text-davinci-003",
             prompt="Generate a creative title for a blog post about technology trends in 2024",
@@ -53,6 +55,8 @@ def daily_post():
     title, content = generate_blog_content()
     if title and content:
         post_to_wordpress(title, content)
+    else:
+        logging.error("No title or content generated.")
 
 # 매일 6시에 실행되도록 설정
 schedule.every().day.at("06:00").do(daily_post)
