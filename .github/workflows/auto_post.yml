@@ -1,9 +1,8 @@
 name: Auto Post to WordPress
 
-# 매일 아침 6시에 자동으로 실행되도록 설정
 on:
   schedule:
-    - cron: "0 21 * * *"  # 한국 시간 기준 아침 6시 (UTC+9)
+    - cron: "0 6 * * *"  # 매일 아침 6시 (UTC 기준, 한국 시간은 UTC+9)
   workflow_dispatch:  # 수동 실행을 위한 트리거
 
 jobs:
@@ -15,13 +14,13 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: '3.12.6'  # Python 3.12.6 버전 설정
 
     - name: Install dependencies
       run: |
-        pip install openai python-wordpress-xmlrpc schedule requests  # 필요한 모듈 설치
+        pip install openai python-wordpress-xmlrpc requests
 
     - name: Run the Python script
       env:
@@ -29,4 +28,4 @@ jobs:
         WP_USERNAME: ${{ secrets.WP_USERNAME }}
         WP_PASSWORD: ${{ secrets.WP_PASSWORD }}
       run: |
-        python auto_post.py  # Python 스크립트 실행
+        python auto_post.py
