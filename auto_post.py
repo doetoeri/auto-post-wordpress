@@ -1,5 +1,6 @@
 import os
 import openai
+import time
 from wordpress_xmlrpc import Client, WordPressPost
 from wordpress_xmlrpc.methods.posts import NewPost
 import logging
@@ -15,28 +16,34 @@ wp = Client('https://claysphere1.wordpress.com/xmlrpc.php', os.getenv('WP_USERNA
 
 # GPT로 블로그 글 생성
 def generate_blog_content():
-    try:
-        # 본문 생성 API 호출
-        content_response = client.completions.create(
-            model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
-            prompt="Write a detailed blog post about technology trends in 2024",
-            max_tokens=1000
-        )
-        content = content_response['choices'][0]['text']
+    retries = 5
+    for attempt in range(retries):
+        try:
+            # 본문 생성 API 호출
+            content_response = client.completions.create(
+                model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
+                prompt="Write a detailed blog post about technology trends in 2024",
+                max_tokens=1000
+            )
+            content = content_response['choices'][0]['text']
 
-        # 제목 생성 API 호출
-        title_response = client.completions.create(
-            model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
-            prompt="Generate a creative title for a blog post about technology trends in 2024",
-            max_tokens=10
-        )
-        title = title_response['choices'][0]['text'].strip()
+            # 제목 생성 API 호출
+            title_response = client.completions.create(
+                model="gpt-3.5-turbo",  # 최신 GPT 모델 사용
+                prompt="Generate a creative title for a blog post about technology trends in 2024",
+                max_tokens=10
+            )
+            title = title_response['choices'][0]['text'].strip()
 
-        return title, content
-    
-    except Exception as e:
-        logging.error(f"Error generating blog content: {e}")
-        return None, None
+            return title, content
+        
+        except openai.error.RateLimitError:
+            logging.error(f"Rate limit exceeded. Retrying in {2 ** attempt} seconds...")
+            time.sleep(2 ** attempt)  # 지수 백오프 전략 적용
+        except Exception as e:
+            logging.error(f"Error generating blog content: {e}")
+            return None, None
+    return None, None
 
 # 워드프레스에 글 업로드
 def post_to_wordpress(title, content):
