@@ -16,7 +16,7 @@ def generate_blog_content():
     # 글 본문 생성
     content_response = openai.Completion.create(
         engine="text-davinci-003",  # 사용할 GPT 모델
-        prompt="Write a detailed blog post about technology trends in 2024",  # 원하는 주제
+        prompt="'삐릿...dumelang! 봇츠와나 입니다!'로 시작하는 재미있는 컨트리볼 이야기를 만들어주세요. 이야기는 'made by BOTswana&counballchan'으로 끝나게 해주세요. 한국어로 작성해주세요.",  # 원하는 주제
         max_tokens=1000
     )
     content = content_response['choices'][0]['text']
